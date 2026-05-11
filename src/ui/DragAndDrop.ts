@@ -1,13 +1,13 @@
 import Dropzone from "dropzone";
 
-type SpineFileProcessor = (jsonFile: File, atlasFile: File, pngFile: File) => void;
-
-const ON_DRAG_OVER_COLOR = 'green';
-const ON_DRAG_LEAVE_COLOR = 'red';
-
+type SpineFileProcessor = (files: File[]) => void;
 
 export function EnableDragAndDrop(editorElement: HTMLElement, cb: SpineFileProcessor) {
-    const dropzone = new Dropzone(".droppable_zone", { url: "/", previewsContainer: false, });
+    const dropzone = new Dropzone(".droppable_zone", {
+        url: "/",
+        previewsContainer: false,
+        clickable: true,
+    });
 
     ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
         editorElement.addEventListener(eventName, (e) => e.preventDefault());
@@ -33,34 +33,16 @@ export function EnableDragAndDrop(editorElement: HTMLElement, cb: SpineFileProce
     });
 
     dropzone.on("addedfiles", (event: Dropzone.DropzoneFile[]) => {
-        const classesToRemove = [
-            'draggableArea',
-            '.droppable_zone',
-        ];
-
-        classesToRemove.forEach((className) => editorElement.classList.remove(className));
-
         const files = Array.from(event);
-        const jsonFile = files.find(file => file.name.endsWith(".json"));
-        const atlasFile = files.find(file => file.name.endsWith(".atlas"));
-        const pngFile = files.find(file => file.name.endsWith(".png"));
+        if (files.length === 0) return;
 
-        if (jsonFile && atlasFile && pngFile) {
-            console.log("Files detected:", {
-                json: jsonFile.xhr?.onload,
-                atlas: atlasFile.webkitRelativePath,
-                png: pngFile.webkitRelativePath
-            });
-
-            document.getElementById('drop_message')?.remove();
-
-            cb(jsonFile, atlasFile, pngFile);
-
-        } else {
-            dropzone.removeAllFiles(true);
-            console.error("Missing required files. Ensure you drop JSON, ATLAS, and PNG files together.");
-        }
+        cb(files);
     });
+}
+
+export function showDropMessage(text: string) {
+    const el = document.getElementById('drop_message');
+    if (el) el.textContent = text;
 }
 
 
