@@ -13,10 +13,28 @@
     <div id="container">
         <!-- Side Panel -->
         <aside id="controls_side_panel">
-            <h2>Animations</h2>
-            <ul id="animations-list">
-                <!-- Animation list items will be dynamically added here -->
-            </ul>
+            <div id="side_panel_sections">
+                <details class="side-panel-section" id="section-animations" open>
+                    <summary>Animations</summary>
+                    <ul id="animations-list" class="side-panel-list">
+                        <!-- Animation list items will be dynamically added here -->
+                    </ul>
+                </details>
+
+                <details class="side-panel-section" id="section-slots">
+                    <summary>Slots</summary>
+                    <ul id="slots-list" class="side-panel-list">
+                        <!-- Slot list items will be dynamically added here -->
+                    </ul>
+                </details>
+
+                <details class="side-panel-section" id="section-events">
+                    <summary>Events</summary>
+                    <ul id="events-list" class="side-panel-list">
+                        <!-- Event list items will be dynamically added here -->
+                    </ul>
+                </details>
+            </div>
             <div id="default_spine_button" class="bottom-button">
                 <a href="#">Load Default Asset</a>
             </div>
@@ -33,7 +51,7 @@
 
             <!-- Canvas Drop Zone -->
             <section id="canvas_editor" class="droppable_zone draggableArea">
-                <p id="drop_message">Drag and drop JSON, Atlas, and PNG files here</p>
+                <p id="drop_message">Drag and drop or click to select your Spine files (.json, .atlas, and the texture image(s) the atlas references)</p>
             </section>
 
             <!-- Bottom Controls Panel -->

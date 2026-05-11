@@ -32,3 +32,7 @@ export const drawBoundsOnSpine$ = new BehaviorSubject<boolean>(false);
 export const enableLoopOnSpine$ = new BehaviorSubject<boolean>(false);
 
 export const eventsList$ = new BehaviorSubject<CustomSpineEventData[]>([]);
+
+export const slotsList$ = new BehaviorSubject<string[]>([]);
+export const eventNamesList$ = new BehaviorSubject<string[]>([]);
+export const selectedSlot$ = new BehaviorSubject<string | null>(null);

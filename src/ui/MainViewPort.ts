@@ -1,12 +1,11 @@
-import { Application, Assets, Container, Graphics, Point, Rectangle, Ticker } from "pixi.js";
+import { Application, Container, Graphics, Point, Rectangle, Ticker } from "pixi.js";
 import {  ToolState } from "../core/LifeCycle";
-import { EnableDragAndDrop } from "./DragAndDrop";
+import { EnableDragAndDrop, showDropMessage } from "./DragAndDrop";
 import { SpineLoader } from "../loaders/SpineLoader";
 import { EnableLoadDefaultSpineButton, toggleDisableDefaultButton } from "../loaders/LoadDefaultAsset";
 import { SpineController } from "../Spine/SpineController";
 import { VisualComponent } from "../core/VisualComponent";
-import { animationList$, animationTime$, animationTime$$, drawBoundsOnSpine$, enableLoopOnSpine$, eventsList$, isPlaying$, pixiApp$, selectedAnimation$, spineMetaData$, totalAnimDuration$ } from "../state/RxStores";
-import { SpineTexture, TextureAtlas } from "@esotericsoftware/spine-pixi-v8";
+import { animationList$, animationTime$, animationTime$$, drawBoundsOnSpine$, enableLoopOnSpine$, eventNamesList$, eventsList$, isPlaying$, pixiApp$, selectedAnimation$, selectedSlot$, slotsList$, spineMetaData$, totalAnimDuration$ } from "../state/RxStores";
 
 
 
@@ -32,33 +31,17 @@ export class MainViewPort extends VisualComponent {
         });
 
         const canvasContainer = document.getElementById('canvas_editor')!;
-        EnableDragAndDrop(canvasContainer, async (jsonFile, atlasFile, pngFile) => {
-
+        EnableDragAndDrop(canvasContainer, async (files) => {
             const spineLoader = new SpineLoader();
-            const onLoadSpines = spineLoader.loadSpineAssets({
-                atlasFile: atlasFile,
-                jsonFile: jsonFile,
-                pngFile: pngFile,
-            });
 
-
-            onLoadSpines.then((v) => {
-                const { spineAtlas, spineImage } = v;
-                
-                const textureAtlas = new TextureAtlas(spineAtlas);
-                Assets.cache.set('atlas', textureAtlas);
-                
-                for (const page of textureAtlas.pages) {
-                    const sprite = Assets.get('spineImage');
-                    page.setTexture(SpineTexture.from(sprite.source));
-                }
-
+            try {
+                await spineLoader.loadSpineAssets(files);
                 this.changeState(ToolState.LOAD_SPINE);
-
-            }).catch(error => {
+            } catch (error) {
+                const message = error instanceof Error ? error.message : String(error);
                 console.error("Failed to load assets", error);
-            });
-
+                showDropMessage(message);
+            }
         });
     }
 
@@ -89,6 +72,9 @@ export class MainViewPort extends VisualComponent {
         const animations = this._spineController.getAnimationNames();
 
         animationList$.next(animations);
+        slotsList$.next(this._spineController.getSlotNames());
+        eventNamesList$.next(this._spineController.getEventNames());
+        selectedSlot$.next(null);
 
         enableLoopOnSpine$.next(true);
 
@@ -153,6 +139,10 @@ export class MainViewPort extends VisualComponent {
 
         enableLoopOnSpine$.subscribe(shouldLoop => {
             this._spineController.toggleLoop(shouldLoop);
+        });
+
+        selectedSlot$.subscribe(slotName => {
+            this._spineController.setSelectedSlot(slotName);
         });
     }
 

@@ -1,5 +1,5 @@
-import { NumberArrayLike, RegionAttachment, Spine, EventTimeline } from "@esotericsoftware/spine-pixi-v8";
-import { Container, Graphics, Rectangle, Ticker } from "pixi.js";
+import { NumberArrayLike, RegionAttachment, Spine, EventTimeline, Slot } from "@esotericsoftware/spine-pixi-v8";
+import { Container, Graphics, Point, Rectangle, Ticker } from "pixi.js";
 import { isPlaying$ } from "../state/RxStores";
 
 
@@ -13,6 +13,10 @@ export class SpineController extends Container {
     private _isPlaying = false;
 
     private _drawBounds = false;
+
+    private _slotMarker: Graphics;
+    private _selectedSlot: Slot | null = null;
+    private _markerTmpPoint: Point = new Point();
 
     get isLooping() {
         return this._loop;
@@ -48,6 +52,15 @@ export class SpineController extends Container {
 
         this._boundsDebugGraphics = new Graphics();
         debugParent.addChild(this._boundsDebugGraphics);
+
+        // Slot marker lives on the pixi stage so it stays a fixed on-screen size regardless of canvas zoom.
+        this._slotMarker = new Graphics()
+            .circle(0, 0, 8)
+            .fill({ color: 0x00e5ff })
+            .stroke({ color: 0x000000, width: 2 });
+        this._slotMarker.zIndex = 2000;
+        this._slotMarker.visible = false;
+        parent.parent?.addChild(this._slotMarker);
 
         this.boundsArea = new Rectangle(this._spine.x, this._spine.y, this._spine.width, this._spine.height);
 
@@ -88,6 +101,42 @@ export class SpineController extends Container {
         if (this._drawBounds) {
             this.drawBoundsForAttachment();
         }
+
+        this.updateSlotMarker();
+    }
+
+    private updateSlotMarker() {
+        if (!this._selectedSlot) {
+            if (this._slotMarker.visible) this._slotMarker.visible = false;
+            return;
+        }
+
+        this._markerTmpPoint.set(this._selectedSlot.bone.worldX, this._selectedSlot.bone.worldY);
+        const global = this._spine.toGlobal(this._markerTmpPoint, this._markerTmpPoint);
+        this._slotMarker.position.copyFrom(global);
+        this._slotMarker.visible = true;
+    }
+
+    public getSlotNames(): string[] {
+        return this._spine.skeleton.data.slots.map(s => s.name);
+    }
+
+    public getEventNames(): string[] {
+        return this._spine.skeleton.data.events.map(e => e.name);
+    }
+
+    public setSelectedSlot(name: string | null): void {
+        if (name === null) {
+            this._selectedSlot = null;
+            return;
+        }
+        const slot = this._spine.skeleton.findSlot(name);
+        if (!slot) {
+            console.warn(`Slot not found on skeleton: ${name}`);
+            this._selectedSlot = null;
+            return;
+        }
+        this._selectedSlot = slot;
     }
 
     public setPlay(playing: boolean) {
@@ -167,6 +216,9 @@ export class SpineController extends Container {
 
     public destroy() {
         this._spine.destroy();
+        this._slotMarker.parent?.removeChild(this._slotMarker);
+        this._slotMarker.destroy();
+        this._selectedSlot = null;
         // this.timelinePlayer.dispose();
         Ticker.shared.remove(this.onUpdate, this);
         this._isPlaying = false;
