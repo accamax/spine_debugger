@@ -25,7 +25,10 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - run: npm install --no-audit --no-fund
+      # Lockfile is generated on Windows so it omits the Linux-only rspack
+      # native binding. Drop the lockfile so npm re-resolves optional deps
+      # for the runner's platform. See https://github.com/npm/cli/issues/4828.
+      - run: rm -f package-lock.json && npm install --no-audit --no-fund
 
       - run: npm run build
         env:
