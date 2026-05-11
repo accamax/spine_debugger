@@ -5,7 +5,7 @@ import { SpineLoader } from "../loaders/SpineLoader";
 import { EnableLoadDefaultSpineButton, toggleDisableDefaultButton } from "../loaders/LoadDefaultAsset";
 import { SpineController } from "../Spine/SpineController";
 import { VisualComponent } from "../core/VisualComponent";
-import { animationList$, animationTime$, animationTime$$, drawBoundsOnSpine$, enableLoopOnSpine$, eventsList$, isPlaying$, pixiApp$, selectedAnimation$, spineMetaData$, totalAnimDuration$ } from "../state/RxStores";
+import { animationList$, animationTime$, animationTime$$, drawBoundsOnSpine$, enableLoopOnSpine$, eventNamesList$, eventsList$, isPlaying$, pixiApp$, selectedAnimation$, selectedSlot$, slotsList$, spineMetaData$, totalAnimDuration$ } from "../state/RxStores";
 
 
 
@@ -72,6 +72,9 @@ export class MainViewPort extends VisualComponent {
         const animations = this._spineController.getAnimationNames();
 
         animationList$.next(animations);
+        slotsList$.next(this._spineController.getSlotNames());
+        eventNamesList$.next(this._spineController.getEventNames());
+        selectedSlot$.next(null);
 
         enableLoopOnSpine$.next(true);
 
@@ -136,6 +139,10 @@ export class MainViewPort extends VisualComponent {
 
         enableLoopOnSpine$.subscribe(shouldLoop => {
             this._spineController.toggleLoop(shouldLoop);
+        });
+
+        selectedSlot$.subscribe(slotName => {
+            this._spineController.setSelectedSlot(slotName);
         });
     }
 

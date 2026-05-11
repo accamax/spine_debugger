@@ -1,6 +1,8 @@
 import { PixiInitializer } from "../pixi/PixiInitializer";
 import { TimelinePlayer } from "../ui/TimelinePlayer";
 import { AnimationList } from "../ui/AnimationList";
+import { SlotList } from "../ui/SlotList";
+import { EventList } from "../ui/EventList";
 import { MainViewPort } from "../ui/MainViewPort";
 import { SpineMetaData } from "../ui/SpineMetaInfo";
 import { AnimationOptions } from "../ui/AnimationOptions";
@@ -107,6 +109,8 @@ export async function startCycle() {
     const mainViewPort = new MainViewPort(pixiInitializer.getApp());
     const timelinePlayer = new TimelinePlayer();
     const animationList = new AnimationList();
+    const slotList = new SlotList();
+    const eventList = new EventList();
     const spineMetaData = new SpineMetaData();
     const animationOptions = new AnimationOptions();
 
@@ -116,6 +120,8 @@ export async function startCycle() {
         mainViewPort,
         timelinePlayer,
         animationList,
+        slotList,
+        eventList,
         spineMetaData,
         animationOptions,
     ]);
