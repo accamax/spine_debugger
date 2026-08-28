@@ -10,6 +10,9 @@ import { SkeletonInfoPanel } from "../ui/SkeletonInfoPanel";
 import { SkinList } from "../ui/SkinList";
 import { BoneList } from "../ui/BoneList";
 import { FileTabs } from "../ui/FileTabs";
+import { SlotEditor } from "../ui/SlotEditor";
+import { BoneEditor } from "../ui/BoneEditor";
+import { EditTools } from "../ui/EditTools";
 
 // 1. Interface for visual component logic
 export interface LifeCycleStateHandlers {
@@ -121,6 +124,9 @@ export async function startCycle() {
     const skinList = new SkinList();
     const boneList = new BoneList();
     const fileTabs = new FileTabs();
+    const slotEditor = new SlotEditor();
+    const boneEditor = new BoneEditor();
+    const editTools = new EditTools();
 
     const stateManager = new StateManager([
         pixiInitializer,
@@ -136,6 +142,9 @@ export async function startCycle() {
         skinList,
         boneList,
         fileTabs,
+        slotEditor,
+        boneEditor,
+        editTools,
     ]);
 
     await stateManager.switchState(ToolState.INIT_UI);

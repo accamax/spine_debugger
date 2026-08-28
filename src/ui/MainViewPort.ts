@@ -6,7 +6,7 @@ import { SpineLoader } from "../loaders/SpineLoader";
 import { EnableLoadDefaultSpineButton, fetchDefaultSpineFiles, toggleDisableDefaultButton } from "../loaders/LoadDefaultAsset";
 import { SpineController } from "../Spine/SpineController";
 import { VisualComponent } from "../core/VisualComponent";
-import { animationList$, animationTime$, animationTime$$, bonesList$, drawBonesOnSpine$, drawBoundsOnSpine$, enableLoopOnSpine$, eventDefsList$, eventsList$, isPlaying$, pixiApp$, selectedAnimation$, selectedBone$, selectedSkin$, selectedSlot$, skeletonInfo$, skinsList$, slotsList$, spineMetaData$, totalAnimDuration$ } from "../state/RxStores";
+import { animationList$, animationTime$, animationTime$$, bonesList$, drawBonesOnSpine$, drawBoundsOnSpine$, enableLoopOnSpine$, eventDefsList$, eventsList$, isPlaying$, pixiApp$, selectedAnimation$, selectedBone$, selectedSkin$, selectedSlot$, skeletonInfo$, skinsList$, slotsList$, spineController$, spineMetaData$, totalAnimDuration$ } from "../state/RxStores";
 import { audioBank } from "../state/AudioBank";
 import { fileBank } from "../state/FileBank";
 
@@ -85,6 +85,7 @@ export class MainViewPort extends VisualComponent {
         spineRenderContainer.boundsArea = new Rectangle(0, 0, this.pixiApp.screen.width, this.pixiApp.screen.height);
 
         this._spineController = new SpineController(spineRenderContainer);
+        spineController$.next(this._spineController);
 
 
         document.getElementById('drop_message')?.remove();

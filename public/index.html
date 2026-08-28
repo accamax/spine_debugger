@@ -42,11 +42,55 @@
                     </ul>
                 </details>
 
+                <details class="side-panel-section" id="section-bone-edit" open>
+                    <summary>Bone Editor</summary>
+                    <div class="editor">
+                        <div class="editor__name" id="bone-edit-name"></div>
+                        <label class="editor__row">Rotation
+                            <input type="range" id="bone-rotation" min="-180" max="180" step="1" value="0">
+                        </label>
+                        <label class="editor__row">X
+                            <input type="range" id="bone-x" min="-300" max="300" step="1" value="0">
+                        </label>
+                        <label class="editor__row">Y
+                            <input type="range" id="bone-y" min="-300" max="300" step="1" value="0">
+                        </label>
+                        <label class="editor__row">Scale
+                            <input type="range" id="bone-scale" min="0" max="3" step="0.01" value="1">
+                        </label>
+                        <button type="button" class="editor__btn" id="bone-reset">Reset bone</button>
+                    </div>
+                </details>
+
                 <details class="side-panel-section" id="section-slots">
                     <summary>Slots</summary>
                     <ul id="slots-list" class="side-panel-list">
                         <!-- Slot list items will be dynamically added here -->
                     </ul>
+                </details>
+
+                <details class="side-panel-section" id="section-slot-edit" open>
+                    <summary>Slot Editor</summary>
+                    <div class="editor">
+                        <div class="editor__name" id="slot-edit-name"></div>
+                        <label class="editor__row">Tint
+                            <input type="color" id="slot-color">
+                        </label>
+                        <label class="editor__row">Alpha
+                            <input type="range" id="slot-alpha" min="0" max="1" step="0.01" value="1">
+                        </label>
+                        <label class="editor__row">Blend
+                            <select id="slot-blend">
+                                <option value="0">Normal</option>
+                                <option value="1">Additive</option>
+                                <option value="2">Multiply</option>
+                                <option value="3">Screen</option>
+                            </select>
+                        </label>
+                        <label class="editor__row">Attachment
+                            <select id="slot-attachment"></select>
+                        </label>
+                    </div>
                 </details>
 
                 <details class="side-panel-section" id="section-events">
@@ -124,9 +168,10 @@
                             <label class="option-checkbox">
                                 <input type="checkbox" data-key="enableLoop" /> Enable Loop
                             </label>
-                            <!-- <label class="option-checkbox">
-                            <input type="checkbox" /> Show Grid
-                        </label> -->
+                            <div class="editor__actions">
+                                <button type="button" class="editor__btn" id="save-png">Save PNG</button>
+                                <button type="button" class="editor__btn editor__btn--ghost" id="reset-edits">Reset edits</button>
+                            </div>
                         </div>
                     </div>
 

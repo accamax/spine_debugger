@@ -1,6 +1,7 @@
 // RxStores.ts
 import { Application } from 'pixi.js';
 import { BehaviorSubject } from 'rxjs';
+import type { SpineController } from '../Spine/SpineController';
 import { CustomSpineEventData, SkeletonInfo, SpineEventDef } from '../Spine/SpineController';
 
 
@@ -22,6 +23,9 @@ export const selectedAnimation$ = new BehaviorSubject<string | null>(null);
 export const spineMetaData$ = new BehaviorSubject<SpineMetaData | null>(null);
 
 export const pixiApp$ = new BehaviorSubject<Application | null>(null);
+
+// The live controller for the loaded skeleton, so editor panels can drive it.
+export const spineController$ = new BehaviorSubject<SpineController | null>(null);
 
 export const isPlaying$ = new BehaviorSubject<boolean>(false);
 

@@ -1,6 +1,12 @@
-import { Bone, NumberArrayLike, RegionAttachment, Spine, EventTimeline, Slot } from "@esotericsoftware/spine-pixi-v8";
+import { BlendMode, Bone, NumberArrayLike, RegionAttachment, Spine, EventTimeline, Slot } from "@esotericsoftware/spine-pixi-v8";
 import { Container, Graphics, Point, Rectangle, Ticker } from "pixi.js";
-import { isPlaying$ } from "../state/RxStores";
+import { isPlaying$, pixiApp$ } from "../state/RxStores";
+
+// Live, non-destructive edits re-applied every frame after the animation writes
+// the pose (see beforeUpdateWorldTransforms). Bone edits are offsets on top of
+// the animation; slot colour/attachment are absolute overrides.
+type SlotEdit = { r: number; g: number; b: number; a: number } | undefined;
+type BoneEdit = { rotation: number; x: number; y: number; scale: number };
 
 
 
@@ -22,6 +28,12 @@ export class SpineController extends Container {
     private _bonesDebugGraphics: Graphics;
     private _boneMarker: Graphics;
     private _selectedBone: Bone | null = null;
+
+    // Live edits (see beforeUpdateWorldTransforms).
+    private _slotColor = new Map<string, SlotEdit>();
+    private _slotAttachment = new Map<string, string | null>();
+    private _boneEdits = new Map<string, BoneEdit>();
+    private _originalBlend = new Map<string, BlendMode>();
 
     get isLooping() {
         return this._loop;
@@ -48,6 +60,10 @@ export class SpineController extends Container {
         });
 
         spineParent.addChild(this._spine);
+
+        // Re-apply live edits after the animation sets the pose, before world
+        // transforms are computed.
+        this._spine.beforeUpdateWorldTransforms = () => this.applyEdits();
 
         this.graphics = new Graphics();
         debugParent.addChild(this.graphics);
@@ -326,6 +342,101 @@ export class SpineController extends Container {
         return events;
     }
 
+
+    // ---- live edits ----
+
+    private applyEdits() {
+        const sk = this._spine.skeleton;
+
+        for (const [name, c] of this._slotColor) {
+            if (!c) continue;
+            const slot = sk.findSlot(name);
+            if (slot) slot.color.set(c.r, c.g, c.b, c.a);
+        }
+        for (const [name, attachment] of this._slotAttachment) {
+            const slot = sk.findSlot(name);
+            if (!slot) continue;
+            slot.setAttachment(attachment ? sk.getAttachment(slot.data.index, attachment) : null);
+        }
+        for (const [name, e] of this._boneEdits) {
+            const bone = sk.findBone(name);
+            if (!bone) continue;
+            bone.rotation += e.rotation;
+            bone.x += e.x;
+            bone.y += e.y;
+            bone.scaleX *= e.scale;
+            bone.scaleY *= e.scale;
+        }
+    }
+
+    // Setup-pose values, used to seed the editor controls.
+    public getSlotState(name: string): {
+        r: number; g: number; b: number; a: number;
+        blend: BlendMode; attachment: string | null; attachments: string[];
+    } | null {
+        const slot = this._spine.skeleton.findSlot(name);
+        if (!slot) return null;
+        const idx = slot.data.index;
+        const out: { name: string }[] = [];
+        const sk = this._spine.skeleton;
+        if (sk.skin) sk.skin.getAttachmentsForSlot(idx, out as any);
+        if (sk.data.defaultSkin && sk.data.defaultSkin !== sk.skin) {
+            sk.data.defaultSkin.getAttachmentsForSlot(idx, out as any);
+        }
+        const c = slot.data.color;
+        return {
+            r: c.r, g: c.g, b: c.b, a: c.a,
+            blend: slot.data.blendMode,
+            attachment: slot.data.attachmentName ?? null,
+            attachments: [...new Set(out.map(e => e.name))],
+        };
+    }
+
+    public setSlotColor(name: string, r: number, g: number, b: number, a: number) {
+        this._slotColor.set(name, { r, g, b, a });
+    }
+
+    public setSlotBlend(name: string, mode: BlendMode) {
+        const slot = this._spine.skeleton.findSlot(name);
+        if (!slot) return;
+        if (!this._originalBlend.has(name)) this._originalBlend.set(name, slot.data.blendMode);
+        slot.data.blendMode = mode;
+    }
+
+    // attachment name to swap to, or null to hide.
+    public setSlotAttachment(name: string, attachment: string | null) {
+        this._slotAttachment.set(name, attachment);
+    }
+
+    public getBoneEdit(name: string): BoneEdit {
+        return this._boneEdits.get(name) ?? { rotation: 0, x: 0, y: 0, scale: 1 };
+    }
+
+    public setBoneEdit(name: string, edit: BoneEdit) {
+        this._boneEdits.set(name, edit);
+    }
+
+    public resetBone(name: string) {
+        this._boneEdits.delete(name);
+    }
+
+    public clearEdits() {
+        this._slotColor.clear();
+        this._slotAttachment.clear();
+        this._boneEdits.clear();
+        for (const [name, mode] of this._originalBlend) {
+            const slot = this._spine.skeleton.findSlot(name);
+            if (slot) slot.data.blendMode = mode;
+        }
+        this._originalBlend.clear();
+        // Drop any lingering colour/attachment the edits left on the pose.
+        this._spine.skeleton.setSlotsToSetupPose();
+    }
+
+    public savePng() {
+        const app = pixiApp$.getValue();
+        if (app) app.renderer.extract.download({ target: this._spine, filename: 'spine.png' });
+    }
 
     public destroy() {
         this._spine.destroy();

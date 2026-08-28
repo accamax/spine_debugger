@@ -258,6 +258,87 @@ html, body {
   white-space: nowrap;
 }
 
+/* Slot / bone live editors */
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 6px 4px 12px;
+}
+
+.editor__name {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-strong);
+  word-break: break-all;
+}
+
+.editor__row {
+  display: grid;
+  grid-template-columns: 66px 1fr;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.editor__row input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.editor__row input[type="color"] {
+  width: 100%;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+}
+
+.editor__row select {
+  width: 100%;
+  font-size: 12px;
+  padding: 4px 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.editor__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.editor__btn {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.05s ease;
+}
+
+.editor__btn:hover { background: var(--accent-strong); }
+.editor__btn:active { transform: translateY(1px); }
+
+.editor__btn--ghost {
+  background: none;
+  color: var(--accent-strong);
+}
+
+.editor__btn--ghost:hover {
+  background: var(--accent-soft);
+}
+
 .bottom-button {
   margin-top: auto;
   text-align: center;
