@@ -1,7 +1,7 @@
 // RxStores.ts
 import { Application } from 'pixi.js';
 import { BehaviorSubject } from 'rxjs';
-import { CustomSpineEventData } from '../Spine/SpineController';
+import { CustomSpineEventData, SkeletonInfo } from '../Spine/SpineController';
 
 
 type SpineMetaData = {
@@ -36,3 +36,6 @@ export const eventsList$ = new BehaviorSubject<CustomSpineEventData[]>([]);
 export const slotsList$ = new BehaviorSubject<string[]>([]);
 export const eventNamesList$ = new BehaviorSubject<string[]>([]);
 export const selectedSlot$ = new BehaviorSubject<string | null>(null);
+
+// Static per-skeleton metadata (version, hash, counts) for the loaded Spine.
+export const skeletonInfo$ = new BehaviorSubject<SkeletonInfo | null>(null);

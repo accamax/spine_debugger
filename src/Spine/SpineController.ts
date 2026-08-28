@@ -185,6 +185,28 @@ export class SpineController extends Container {
         return this._spine.skeleton.data.animations.map(anim => anim.name);
     }
 
+    // Static, per-skeleton metadata read straight off the loaded SkeletonData —
+    // handy for confirming the export version and seeing the shape at a glance.
+    public getSkeletonInfo(): SkeletonInfo {
+        const data = this._spine.skeleton.data;
+        return {
+            version: data.version || "—",
+            hash: data.hash || "—",
+            fps: data.fps,
+            width: Math.round(data.width),
+            height: Math.round(data.height),
+            bones: data.bones.length,
+            slots: data.slots.length,
+            skins: data.skins.length,
+            animations: data.animations.length,
+            events: data.events.length,
+            ikConstraints: data.ikConstraints.length,
+            transformConstraints: data.transformConstraints.length,
+            pathConstraints: data.pathConstraints.length,
+            physicsConstraints: data.physicsConstraints.length,
+        };
+    }
+
     public getCurrentAnimationEvents() {
         const trackEntry = this._spine.state.getCurrent(0);
         const animationName = trackEntry!.animation!.name;
@@ -298,6 +320,23 @@ export class SpineController extends Container {
 }
 
 
+
+export type SkeletonInfo = {
+    version: string;
+    hash: string;
+    fps: number;
+    width: number;
+    height: number;
+    bones: number;
+    slots: number;
+    skins: number;
+    animations: number;
+    events: number;
+    ikConstraints: number;
+    transformConstraints: number;
+    pathConstraints: number;
+    physicsConstraints: number;
+};
 
 export class CustomSpineEventData {
     name: string;

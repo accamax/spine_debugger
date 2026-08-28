@@ -6,7 +6,7 @@ import { SpineLoader } from "../loaders/SpineLoader";
 import { EnableLoadDefaultSpineButton, toggleDisableDefaultButton } from "../loaders/LoadDefaultAsset";
 import { SpineController } from "../Spine/SpineController";
 import { VisualComponent } from "../core/VisualComponent";
-import { animationList$, animationTime$, animationTime$$, drawBoundsOnSpine$, enableLoopOnSpine$, eventNamesList$, eventsList$, isPlaying$, pixiApp$, selectedAnimation$, selectedSlot$, slotsList$, spineMetaData$, totalAnimDuration$ } from "../state/RxStores";
+import { animationList$, animationTime$, animationTime$$, drawBoundsOnSpine$, enableLoopOnSpine$, eventNamesList$, eventsList$, isPlaying$, pixiApp$, selectedAnimation$, selectedSlot$, skeletonInfo$, slotsList$, spineMetaData$, totalAnimDuration$ } from "../state/RxStores";
 
 
 
@@ -81,6 +81,7 @@ export class MainViewPort extends VisualComponent {
         animationList$.next(animations);
         slotsList$.next(this._spineController.getSlotNames());
         eventNamesList$.next(this._spineController.getEventNames());
+        skeletonInfo$.next(this._spineController.getSkeletonInfo());
         selectedSlot$.next(null);
 
         enableLoopOnSpine$.next(true);

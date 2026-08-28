@@ -6,6 +6,7 @@ import { EventList } from "../ui/EventList";
 import { MainViewPort } from "../ui/MainViewPort";
 import { SpineMetaData } from "../ui/SpineMetaInfo";
 import { AnimationOptions } from "../ui/AnimationOptions";
+import { SkeletonInfoPanel } from "../ui/SkeletonInfoPanel";
 
 // 1. Interface for visual component logic
 export interface LifeCycleStateHandlers {
@@ -113,6 +114,7 @@ export async function startCycle() {
     const eventList = new EventList();
     const spineMetaData = new SpineMetaData();
     const animationOptions = new AnimationOptions();
+    const skeletonInfoPanel = new SkeletonInfoPanel();
 
     const stateManager = new StateManager([
         pixiInitializer,
@@ -124,6 +126,7 @@ export async function startCycle() {
         eventList,
         spineMetaData,
         animationOptions,
+        skeletonInfoPanel,
     ]);
 
     await stateManager.switchState(ToolState.INIT_UI);
