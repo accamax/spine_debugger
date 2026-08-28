@@ -1,5 +1,5 @@
 import { VisualComponent } from "../core/VisualComponent";
-import { drawBoundsOnSpine$, enableLoopOnSpine$ } from "../state/RxStores";
+import { drawBonesOnSpine$, drawBoundsOnSpine$, enableLoopOnSpine$ } from "../state/RxStores";
 
 export class AnimationOptions extends VisualComponent {
     private inputs: Record<string, HTMLInputElement> = {};
@@ -21,6 +21,8 @@ export class AnimationOptions extends VisualComponent {
                 const checked = checkbox.checked;
                 if (key === "drawBounds") {
                     drawBoundsOnSpine$.next(checked);
+                } else if (key === "drawBones") {
+                    drawBonesOnSpine$.next(checked);
                 } else if (key === "enableLoop") {
                     enableLoopOnSpine$.next(checked);
                 }
@@ -32,10 +34,16 @@ export class AnimationOptions extends VisualComponent {
 
         // Reset stores
         drawBoundsOnSpine$.next(false);
+        drawBonesOnSpine$.next(false);
         enableLoopOnSpine$.next(true);
 
         drawBoundsOnSpine$.subscribe(enabled => {
             const input = this.inputs["drawBounds"];
+            if (input && input.checked !== enabled) input.checked = enabled;
+        })
+
+        drawBonesOnSpine$.subscribe(enabled => {
+            const input = this.inputs["drawBones"];
             if (input && input.checked !== enabled) input.checked = enabled;
         })
 
@@ -50,6 +58,7 @@ export class AnimationOptions extends VisualComponent {
     private resetCheckboxes() {
         Object.values(this.inputs).forEach(input => input.checked = false);
         drawBoundsOnSpine$.next(false);
+        drawBonesOnSpine$.next(false);
         enableLoopOnSpine$.next(false);
     }
 

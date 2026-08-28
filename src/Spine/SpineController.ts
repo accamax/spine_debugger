@@ -1,4 +1,4 @@
-import { NumberArrayLike, RegionAttachment, Spine, EventTimeline, Slot } from "@esotericsoftware/spine-pixi-v8";
+import { Bone, NumberArrayLike, RegionAttachment, Spine, EventTimeline, Slot } from "@esotericsoftware/spine-pixi-v8";
 import { Container, Graphics, Point, Rectangle, Ticker } from "pixi.js";
 import { isPlaying$ } from "../state/RxStores";
 
@@ -13,10 +13,15 @@ export class SpineController extends Container {
     private _isPlaying = false;
 
     private _drawBounds = false;
+    private _drawBones = false;
 
     private _slotMarker: Graphics;
     private _selectedSlot: Slot | null = null;
     private _markerTmpPoint: Point = new Point();
+
+    private _bonesDebugGraphics: Graphics;
+    private _boneMarker: Graphics;
+    private _selectedBone: Bone | null = null;
 
     get isLooping() {
         return this._loop;
@@ -53,6 +58,11 @@ export class SpineController extends Container {
         this._boundsDebugGraphics = new Graphics();
         debugParent.addChild(this._boundsDebugGraphics);
 
+        // Bone overlay shares the skeleton's coordinate space, same as the
+        // bounds overlay above.
+        this._bonesDebugGraphics = new Graphics();
+        debugParent.addChild(this._bonesDebugGraphics);
+
         // Slot marker lives on the pixi stage so it stays a fixed on-screen size regardless of canvas zoom.
         this._slotMarker = new Graphics()
             .circle(0, 0, 8)
@@ -61,6 +71,16 @@ export class SpineController extends Container {
         this._slotMarker.zIndex = 2000;
         this._slotMarker.visible = false;
         parent.parent?.addChild(this._slotMarker);
+
+        // Highlights a bone picked from the Bones list — on the stage like the
+        // slot marker so it stays a fixed size regardless of zoom.
+        this._boneMarker = new Graphics()
+            .circle(0, 0, 7)
+            .fill({ color: 0xff9800 })
+            .stroke({ color: 0x000000, width: 2 });
+        this._boneMarker.zIndex = 2001;
+        this._boneMarker.visible = false;
+        parent.parent?.addChild(this._boneMarker);
 
         this.boundsArea = new Rectangle(this._spine.x, this._spine.y, this._spine.width, this._spine.height);
 
@@ -102,7 +122,24 @@ export class SpineController extends Container {
             this.drawBoundsForAttachment();
         }
 
+        if (this._drawBones) {
+            this.drawBones();
+        }
+
         this.updateSlotMarker();
+        this.updateBoneMarker();
+    }
+
+    private updateBoneMarker() {
+        if (!this._selectedBone) {
+            if (this._boneMarker.visible) this._boneMarker.visible = false;
+            return;
+        }
+
+        this._markerTmpPoint.set(this._selectedBone.worldX, this._selectedBone.worldY);
+        const global = this._spine.toGlobal(this._markerTmpPoint, this._markerTmpPoint);
+        this._boneMarker.position.copyFrom(global);
+        this._boneMarker.visible = true;
     }
 
     private updateSlotMarker() {
@@ -123,6 +160,24 @@ export class SpineController extends Container {
 
     public getSkinNames(): string[] {
         return this._spine.skeleton.data.skins.map(s => s.name);
+    }
+
+    public getBoneNames(): string[] {
+        return this._spine.skeleton.data.bones.map(b => b.name);
+    }
+
+    public setSelectedBone(name: string | null): void {
+        if (name === null) {
+            this._selectedBone = null;
+            return;
+        }
+        const bone = this._spine.skeleton.findBone(name);
+        if (!bone) {
+            console.warn(`Bone not found on skeleton: ${name}`);
+            this._selectedBone = null;
+            return;
+        }
+        this._selectedBone = bone;
     }
 
     public getCurrentSkinName(): string | null {
@@ -228,7 +283,7 @@ export class SpineController extends Container {
         return {
             version: data.version || "—",
             hash: data.hash || "—",
-            fps: data.fps,
+            fps: data.fps ?? 0,
             width: Math.round(data.width),
             height: Math.round(data.height),
             bones: data.bones.length,
@@ -277,6 +332,9 @@ export class SpineController extends Container {
         this._slotMarker.parent?.removeChild(this._slotMarker);
         this._slotMarker.destroy();
         this._selectedSlot = null;
+        this._boneMarker.parent?.removeChild(this._boneMarker);
+        this._boneMarker.destroy();
+        this._selectedBone = null;
         // this.timelinePlayer.dispose();
         Ticker.shared.remove(this.onUpdate, this);
         this._isPlaying = false;
@@ -332,6 +390,35 @@ export class SpineController extends Container {
     public clearDrawBoundsForAttachment() {
         this._boundsDebugGraphics.clear();
         this.graphics.clear();
+    }
+
+    public toggleDrawBones(active: boolean) {
+        this._drawBones = active;
+        if (!active) this._bonesDebugGraphics.clear();
+    }
+
+    // Draw each bone as a line from its origin along its length, with a joint dot
+    // at every origin. Bone world transforms live in the same space as the
+    // attachment bounds, so this overlay lines up with the rendered skeleton.
+    public drawBones() {
+        const g = this._bonesDebugGraphics;
+        g.clear();
+
+        const bones = this._spine.skeleton.bones;
+
+        for (const bone of bones) {
+            const len = bone.data.length;
+            if (len > 0) {
+                g.moveTo(bone.worldX, bone.worldY)
+                    .lineTo(bone.worldX + bone.a * len, bone.worldY + bone.c * len)
+                    .stroke({ color: 0xff9800, pixelLine: true });
+            }
+        }
+
+        // Joints on top of the lines.
+        for (const bone of bones) {
+            g.circle(bone.worldX, bone.worldY, 3).fill({ color: 0xffc107 });
+        }
     }
 
     public getVertsCount() {

@@ -42,7 +42,7 @@ export class SkeletonInfoPanel extends VisualComponent {
         this.listEl.append(
             this.row('Spine version', info.version),
             this.row('Hash', info.hash),
-            this.row('FPS', info.fps),
+            this.row('FPS', info.fps || '—'),
             this.row('Setup size', `${info.width} × ${info.height}`),
             this.row('Bones', info.bones),
             this.row('Slots', info.slots),

@@ -6,7 +6,7 @@ import { SpineLoader } from "../loaders/SpineLoader";
 import { EnableLoadDefaultSpineButton, toggleDisableDefaultButton } from "../loaders/LoadDefaultAsset";
 import { SpineController } from "../Spine/SpineController";
 import { VisualComponent } from "../core/VisualComponent";
-import { animationList$, animationTime$, animationTime$$, drawBoundsOnSpine$, enableLoopOnSpine$, eventDefsList$, eventsList$, isPlaying$, pixiApp$, selectedAnimation$, selectedSkin$, selectedSlot$, skeletonInfo$, skinsList$, slotsList$, spineMetaData$, totalAnimDuration$ } from "../state/RxStores";
+import { animationList$, animationTime$, animationTime$$, bonesList$, drawBonesOnSpine$, drawBoundsOnSpine$, enableLoopOnSpine$, eventDefsList$, eventsList$, isPlaying$, pixiApp$, selectedAnimation$, selectedBone$, selectedSkin$, selectedSlot$, skeletonInfo$, skinsList$, slotsList$, spineMetaData$, totalAnimDuration$ } from "../state/RxStores";
 import { audioBank } from "../state/AudioBank";
 
 
@@ -87,6 +87,8 @@ export class MainViewPort extends VisualComponent {
         skeletonInfo$.next(this._spineController.getSkeletonInfo());
         skinsList$.next(this._spineController.getSkinNames());
         selectedSkin$.next(this._spineController.getCurrentSkinName());
+        bonesList$.next(this._spineController.getBoneNames());
+        selectedBone$.next(null);
         selectedSlot$.next(null);
 
         enableLoopOnSpine$.next(true);
@@ -150,6 +152,10 @@ export class MainViewPort extends VisualComponent {
             this._spineController.toggleDrawBounds(shouldDraw);
         });
 
+        drawBonesOnSpine$.subscribe(shouldDraw => {
+            this._spineController.toggleDrawBones(shouldDraw);
+        });
+
         enableLoopOnSpine$.subscribe(shouldLoop => {
             this._spineController.toggleLoop(shouldLoop);
         });
@@ -160,6 +166,10 @@ export class MainViewPort extends VisualComponent {
 
         selectedSkin$.subscribe(skinName => {
             this._spineController.setSkin(skinName);
+        });
+
+        selectedBone$.subscribe(boneName => {
+            this._spineController.setSelectedBone(boneName);
         });
     }
 

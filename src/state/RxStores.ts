@@ -29,6 +29,7 @@ export const totalAnimDuration$ = new BehaviorSubject<number>(0);
 export const animationTime$$ = new BehaviorSubject<number>(0);
 
 export const drawBoundsOnSpine$ = new BehaviorSubject<boolean>(false);
+export const drawBonesOnSpine$ = new BehaviorSubject<boolean>(false);
 export const enableLoopOnSpine$ = new BehaviorSubject<boolean>(false);
 
 export const eventsList$ = new BehaviorSubject<CustomSpineEventData[]>([]);
@@ -43,3 +44,7 @@ export const skeletonInfo$ = new BehaviorSubject<SkeletonInfo | null>(null);
 // Available skins and the currently applied one.
 export const skinsList$ = new BehaviorSubject<string[]>([]);
 export const selectedSkin$ = new BehaviorSubject<string | null>(null);
+
+// Available bones and the one highlighted from the list.
+export const bonesList$ = new BehaviorSubject<string[]>([]);
+export const selectedBone$ = new BehaviorSubject<string | null>(null);
