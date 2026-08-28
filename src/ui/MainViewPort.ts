@@ -6,7 +6,7 @@ import { SpineLoader } from "../loaders/SpineLoader";
 import { EnableLoadDefaultSpineButton, toggleDisableDefaultButton } from "../loaders/LoadDefaultAsset";
 import { SpineController } from "../Spine/SpineController";
 import { VisualComponent } from "../core/VisualComponent";
-import { animationList$, animationTime$, animationTime$$, drawBoundsOnSpine$, enableLoopOnSpine$, eventNamesList$, eventsList$, isPlaying$, pixiApp$, selectedAnimation$, selectedSlot$, skeletonInfo$, slotsList$, spineMetaData$, totalAnimDuration$ } from "../state/RxStores";
+import { animationList$, animationTime$, animationTime$$, drawBoundsOnSpine$, enableLoopOnSpine$, eventNamesList$, eventsList$, isPlaying$, pixiApp$, selectedAnimation$, selectedSkin$, selectedSlot$, skeletonInfo$, skinsList$, slotsList$, spineMetaData$, totalAnimDuration$ } from "../state/RxStores";
 
 
 
@@ -82,6 +82,8 @@ export class MainViewPort extends VisualComponent {
         slotsList$.next(this._spineController.getSlotNames());
         eventNamesList$.next(this._spineController.getEventNames());
         skeletonInfo$.next(this._spineController.getSkeletonInfo());
+        skinsList$.next(this._spineController.getSkinNames());
+        selectedSkin$.next(this._spineController.getCurrentSkinName());
         selectedSlot$.next(null);
 
         enableLoopOnSpine$.next(true);
@@ -151,6 +153,10 @@ export class MainViewPort extends VisualComponent {
 
         selectedSlot$.subscribe(slotName => {
             this._spineController.setSelectedSlot(slotName);
+        });
+
+        selectedSkin$.subscribe(skinName => {
+            this._spineController.setSkin(skinName);
         });
     }
 

@@ -39,3 +39,7 @@ export const selectedSlot$ = new BehaviorSubject<string | null>(null);
 
 // Static per-skeleton metadata (version, hash, counts) for the loaded Spine.
 export const skeletonInfo$ = new BehaviorSubject<SkeletonInfo | null>(null);
+
+// Available skins and the currently applied one.
+export const skinsList$ = new BehaviorSubject<string[]>([]);
+export const selectedSkin$ = new BehaviorSubject<string | null>(null);

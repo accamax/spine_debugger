@@ -121,6 +121,28 @@ export class SpineController extends Container {
         return this._spine.skeleton.data.slots.map(s => s.name);
     }
 
+    public getSkinNames(): string[] {
+        return this._spine.skeleton.data.skins.map(s => s.name);
+    }
+
+    public getCurrentSkinName(): string | null {
+        return (
+            this._spine.skeleton.skin?.name ??
+            this._spine.skeleton.data.defaultSkin?.name ??
+            null
+        );
+    }
+
+    // Swap the active skin. Attachments missing from it still fall back to the
+    // default skin. Slots must be reset to setup pose or the old skin's
+    // attachments linger.
+    public setSkin(name: string | null) {
+        if (!name) return;
+        const skeleton = this._spine.skeleton;
+        skeleton.setSkinByName(name);
+        skeleton.setSlotsToSetupPose();
+    }
+
     public getEventNames(): string[] {
         return this._spine.skeleton.data.events.map(e => e.name);
     }
