@@ -1,6 +1,7 @@
 import { Application, Container, Graphics, Point, Rectangle, Ticker } from "pixi.js";
 import {  ToolState } from "../core/LifeCycle";
 import { EnableDragAndDrop, showDropMessage } from "./DragAndDrop";
+import { EnableExternalHandoff } from "./ExternalHandoff";
 import { SpineLoader } from "../loaders/SpineLoader";
 import { EnableLoadDefaultSpineButton, toggleDisableDefaultButton } from "../loaders/LoadDefaultAsset";
 import { SpineController } from "../Spine/SpineController";
@@ -31,7 +32,10 @@ export class MainViewPort extends VisualComponent {
         });
 
         const canvasContainer = document.getElementById('canvas_editor')!;
-        EnableDragAndDrop(canvasContainer, async (files) => {
+
+        // Both entry points — a local drop and a set handed over from the vault
+        // — load the same way.
+        const load = async (files: File[]) => {
             const spineLoader = new SpineLoader();
 
             try {
@@ -42,7 +46,10 @@ export class MainViewPort extends VisualComponent {
                 console.error("Failed to load assets", error);
                 showDropMessage(message);
             }
-        });
+        };
+
+        EnableDragAndDrop(canvasContainer, load);
+        EnableExternalHandoff(load);
     }
 
     async HandleLoadSpine(): Promise<void> {
