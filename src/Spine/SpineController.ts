@@ -147,6 +147,20 @@ export class SpineController extends Container {
         return this._spine.skeleton.data.events.map(e => e.name);
     }
 
+    // Event definitions with their default params and audio settings, read off
+    // SkeletonData at load time (independent of any animation).
+    public getEventDefinitions(): SpineEventDef[] {
+        return this._spine.skeleton.data.events.map(e => ({
+            name: e.name,
+            intValue: e.intValue,
+            floatValue: e.floatValue,
+            stringValue: e.stringValue,
+            audioPath: e.audioPath,
+            volume: e.volume,
+            balance: e.balance,
+        }));
+    }
+
     public setSelectedSlot(name: string | null): void {
         if (name === null) {
             this._selectedSlot = null;
@@ -342,6 +356,16 @@ export class SpineController extends Container {
 }
 
 
+
+export type SpineEventDef = {
+    name: string;
+    intValue: number;
+    floatValue: number;
+    stringValue: string | null;
+    audioPath: string | null;
+    volume: number;
+    balance: number;
+};
 
 export type SkeletonInfo = {
     version: string;

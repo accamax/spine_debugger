@@ -1,20 +1,16 @@
 import { selectedSlot$, slotsList$ } from "../state/RxStores";
+import { setSectionVisible } from "./sectionVisibility";
 import { VisualComponent } from "../core/VisualComponent";
 
 export class SlotList extends VisualComponent {
     private listEl: HTMLUListElement | null = null;
 
     private populate(names: string[]) {
+        setSectionVisible('section-slots', names.length > 0);
         if (!this.listEl) return;
         this.listEl.innerHTML = '';
 
-        if (names.length === 0) {
-            const li = document.createElement('li');
-            li.className = 'empty';
-            li.textContent = '(no slots)';
-            this.listEl.appendChild(li);
-            return;
-        }
+        if (names.length === 0) return;
 
         const selected = selectedSlot$.getValue();
         for (const name of names) {

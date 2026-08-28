@@ -1,5 +1,6 @@
 import { skeletonInfo$ } from "../state/RxStores";
 import { SkeletonInfo } from "../Spine/SpineController";
+import { setSectionVisible } from "./sectionVisibility";
 import { VisualComponent } from "../core/VisualComponent";
 
 // The skeleton's static metadata (export version, hash, counts) as a labelled
@@ -26,16 +27,11 @@ export class SkeletonInfoPanel extends VisualComponent {
     }
 
     private populate(info: SkeletonInfo | null) {
+        setSectionVisible('section-skeleton', info !== null);
         if (!this.listEl) return;
         this.listEl.innerHTML = '';
 
-        if (info === null) {
-            const empty = document.createElement('div');
-            empty.className = 'empty';
-            empty.textContent = '(no skeleton)';
-            this.listEl.appendChild(empty);
-            return;
-        }
+        if (info === null) return;
 
         const constraints =
             info.ikConstraints +

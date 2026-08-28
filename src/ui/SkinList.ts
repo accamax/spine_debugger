@@ -1,4 +1,5 @@
 import { selectedSkin$, skinsList$ } from "../state/RxStores";
+import { setSectionVisible } from "./sectionVisibility";
 import { VisualComponent } from "../core/VisualComponent";
 
 // Lists the skeleton's skins and switches the active one on click. Unlike the
@@ -8,16 +9,13 @@ export class SkinList extends VisualComponent {
     private listEl: HTMLUListElement | null = null;
 
     private populate(names: string[]) {
+        // Only worth showing when there's a real choice — a lone default skin
+        // isn't switchable.
+        setSectionVisible('section-skins', names.length > 1);
         if (!this.listEl) return;
         this.listEl.innerHTML = '';
 
-        if (names.length === 0) {
-            const li = document.createElement('li');
-            li.className = 'empty';
-            li.textContent = '(no skins)';
-            this.listEl.appendChild(li);
-            return;
-        }
+        if (names.length === 0) return;
 
         const selected = selectedSkin$.getValue();
         for (const name of names) {

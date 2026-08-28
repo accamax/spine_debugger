@@ -6,7 +6,8 @@ import { SpineLoader } from "../loaders/SpineLoader";
 import { EnableLoadDefaultSpineButton, toggleDisableDefaultButton } from "../loaders/LoadDefaultAsset";
 import { SpineController } from "../Spine/SpineController";
 import { VisualComponent } from "../core/VisualComponent";
-import { animationList$, animationTime$, animationTime$$, drawBoundsOnSpine$, enableLoopOnSpine$, eventNamesList$, eventsList$, isPlaying$, pixiApp$, selectedAnimation$, selectedSkin$, selectedSlot$, skeletonInfo$, skinsList$, slotsList$, spineMetaData$, totalAnimDuration$ } from "../state/RxStores";
+import { animationList$, animationTime$, animationTime$$, drawBoundsOnSpine$, enableLoopOnSpine$, eventDefsList$, eventsList$, isPlaying$, pixiApp$, selectedAnimation$, selectedSkin$, selectedSlot$, skeletonInfo$, skinsList$, slotsList$, spineMetaData$, totalAnimDuration$ } from "../state/RxStores";
+import { audioBank } from "../state/AudioBank";
 
 
 
@@ -39,6 +40,8 @@ export class MainViewPort extends VisualComponent {
             const spineLoader = new SpineLoader();
 
             try {
+                // Keep any audio files so event sounds can be played back.
+                audioBank.set(files);
                 await spineLoader.loadSpineAssets(files);
                 this.changeState(ToolState.LOAD_SPINE);
             } catch (error) {
@@ -80,7 +83,7 @@ export class MainViewPort extends VisualComponent {
 
         animationList$.next(animations);
         slotsList$.next(this._spineController.getSlotNames());
-        eventNamesList$.next(this._spineController.getEventNames());
+        eventDefsList$.next(this._spineController.getEventDefinitions());
         skeletonInfo$.next(this._spineController.getSkeletonInfo());
         skinsList$.next(this._spineController.getSkinNames());
         selectedSkin$.next(this._spineController.getCurrentSkinName());
