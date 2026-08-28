@@ -33,8 +33,11 @@ export class BoneEditor extends VisualComponent {
     private populate(bone: string | null) {
         this.bone = bone;
         const c = spineController$.getValue();
+        const section = document.getElementById('section-bone-edit') as HTMLDetailsElement | null;
         setSectionVisible('section-bone-edit', !!(bone && c));
         if (!bone || !c) return;
+        // Bring it into view so a selection isn't missed.
+        if (section) { section.open = true; section.scrollIntoView({ block: 'nearest' }); }
         if (this.nameEl) this.nameEl.textContent = bone;
         this.seed(c.getBoneEdit(bone));
     }

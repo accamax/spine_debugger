@@ -34,8 +34,12 @@ export class SlotEditor extends VisualComponent {
         this.slot = slot;
         const c = spineController$.getValue();
         const state = slot && c ? c.getSlotState(slot) : null;
+        const section = document.getElementById('section-slot-edit') as HTMLDetailsElement | null;
         setSectionVisible('section-slot-edit', !!state);
         if (!state || !slot) return;
+
+        // It sits low in the panel — bring it into view so a selection isn't missed.
+        if (section) { section.open = true; section.scrollIntoView({ block: 'nearest' }); }
 
         if (this.nameEl) this.nameEl.textContent = slot;
         if (this.colorEl) this.colorEl.value = this.toHex(state.r, state.g, state.b);
