@@ -1,5 +1,21 @@
 import { Assets } from "pixi.js";
 
+// The bundled demo skeleton's files, so the inspector tabs (which work off the
+// raw File[]) can show the default asset too, not just dropped ones.
+const DEFAULT_SPINE_URLS = [
+    './assets/spineboy.atlas',
+    './assets/spineboy-ess.json',
+    './assets/spineboy.png',
+];
+
+export async function fetchDefaultSpineFiles(): Promise<File[]> {
+    return Promise.all(DEFAULT_SPINE_URLS.map(async (url) => {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        return new File([blob], url.split('/').pop()!, { type: blob.type });
+    }));
+}
+
 export function EnableLoadDefaultSpineButton(cb: CallableFunction) {
     const button = document.getElementById('default_spine_button');
 

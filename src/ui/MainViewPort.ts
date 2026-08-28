@@ -3,11 +3,12 @@ import {  ToolState } from "../core/LifeCycle";
 import { EnableDragAndDrop, showDropMessage } from "./DragAndDrop";
 import { EnableExternalHandoff } from "./ExternalHandoff";
 import { SpineLoader } from "../loaders/SpineLoader";
-import { EnableLoadDefaultSpineButton, toggleDisableDefaultButton } from "../loaders/LoadDefaultAsset";
+import { EnableLoadDefaultSpineButton, fetchDefaultSpineFiles, toggleDisableDefaultButton } from "../loaders/LoadDefaultAsset";
 import { SpineController } from "../Spine/SpineController";
 import { VisualComponent } from "../core/VisualComponent";
 import { animationList$, animationTime$, animationTime$$, bonesList$, drawBonesOnSpine$, drawBoundsOnSpine$, enableLoopOnSpine$, eventDefsList$, eventsList$, isPlaying$, pixiApp$, selectedAnimation$, selectedBone$, selectedSkin$, selectedSlot$, skeletonInfo$, skinsList$, slotsList$, spineMetaData$, totalAnimDuration$ } from "../state/RxStores";
 import { audioBank } from "../state/AudioBank";
+import { fileBank } from "../state/FileBank";
 
 
 
@@ -28,7 +29,14 @@ export class MainViewPort extends VisualComponent {
     }
 
     async HandleEmptyDisplay(): Promise<void> {
-        EnableLoadDefaultSpineButton(() => {
+        EnableLoadDefaultSpineButton(async () => {
+            // Populate the banks from the demo files so the inspector tabs work
+            // for the default asset too; failure just leaves the tabs empty.
+            try {
+                const files = await fetchDefaultSpineFiles();
+                audioBank.set(files);
+                await fileBank.set(files);
+            } catch { /* ignore */ }
             this.changeState(ToolState.LOAD_SPINE);
         });
 
@@ -40,8 +48,10 @@ export class MainViewPort extends VisualComponent {
             const spineLoader = new SpineLoader();
 
             try {
-                // Keep any audio files so event sounds can be played back.
+                // Keep any audio files so event sounds can be played back, and
+                // the raw files so the inspector tabs can show them.
                 audioBank.set(files);
+                await fileBank.set(files);
                 await spineLoader.loadSpineAssets(files);
                 this.changeState(ToolState.LOAD_SPINE);
             } catch (error) {

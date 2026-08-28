@@ -324,6 +324,149 @@ html, body {
   margin-left: 6px;
 }
 
+/* View tabs */
+.view-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.view-tabs .tab {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 9px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.12s ease, border-color 0.12s ease;
+}
+
+.view-tabs .tab:hover {
+  color: var(--ink);
+}
+
+.view-tabs .tab.active {
+  color: var(--accent-strong);
+  border-bottom-color: var(--accent);
+}
+
+/* Any view hides cleanly even if it has its own display value. */
+[data-view][hidden] {
+  display: none !important;
+}
+
+/* File inspector views */
+.file-view {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+}
+
+.code {
+  margin: 0;
+  padding: 16px 18px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink);
+  white-space: pre;
+  tab-size: 2;
+}
+
+.images-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 18px;
+}
+
+.atlas-page__cap {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+
+.atlas-page__box {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+  /* Checkerboard so transparent areas of the page read clearly. */
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, #e6e8eb 25%, transparent 25%),
+    linear-gradient(-45deg, #e6e8eb 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e6e8eb 75%),
+    linear-gradient(-45deg, transparent 75%, #e6e8eb 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.atlas-page__img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.atlas-page__regions {
+  position: absolute;
+  inset: 0;
+}
+
+.atlas-region {
+  position: absolute;
+  border: 1px solid rgba(0, 123, 255, 0.5);
+  box-sizing: border-box;
+  transition: background-color 0.1s ease, border-color 0.1s ease;
+}
+
+.atlas-region:hover {
+  border-color: var(--accent);
+  background: rgba(0, 123, 255, 0.18);
+  z-index: 2;
+}
+
+.atlas-region__label {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  display: none;
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.4;
+  padding: 1px 5px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.atlas-region:hover .atlas-region__label {
+  display: block;
+}
+
+.atlas-page__missing {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-faint);
+  padding: 24px;
+  line-height: 0;
+}
+
 /* Canvas Drop Area */
 #canvas_editor {
   flex: 1;

@@ -63,6 +63,14 @@
 
         <!-- Main Content -->
         <main id="main_content">
+            <!-- View tabs -->
+            <div id="view-tabs" class="view-tabs">
+                <button type="button" class="tab active" data-tab="viewer">Viewer</button>
+                <button type="button" class="tab" data-tab="json">JSON</button>
+                <button type="button" class="tab" data-tab="atlas">Atlas</button>
+                <button type="button" class="tab" data-tab="images">Images</button>
+            </div>
+
             <!-- Stats -->
             <section id="stats">
                 <div class="stat">Draw Calls: <span id="draw-calls">0</span></div>
@@ -71,9 +79,14 @@
             </section>
 
             <!-- Canvas Drop Zone -->
-            <section id="canvas_editor" class="droppable_zone draggableArea">
+            <section id="canvas_editor" class="droppable_zone draggableArea" data-view="viewer">
                 <p id="drop_message">Drag and drop or click to select your Spine files (.json, .atlas, and the texture image(s) the atlas references)</p>
             </section>
+
+            <!-- File inspector views -->
+            <section class="file-view" data-view="json" hidden><pre id="file-json" class="code"></pre></section>
+            <section class="file-view" data-view="atlas" hidden><pre id="file-atlas" class="code"></pre></section>
+            <section class="file-view" data-view="images" hidden><div id="file-images" class="images-wrap"></div></section>
 
             <!-- Bottom Controls Panel -->
             <section class="bottom_controls">
